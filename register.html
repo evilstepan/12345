@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Регистрация</title>
+    <link rel="stylesheet" href="style1.css">
+</head>
+<body>
+    <section class="signup">
+        <h2>Стань участником Организации</h2>
+        <p>Посетители, зарегистрированные на сайте, получают рассылки, а также узнают, на какие мероприятия записаны.</p>
+        <form id="registrationForm">
+            <div class="form-group">
+                <label for="name">Ваше ФИО</label>
+                <input type="text" id="name" name="name" required placeholder="Иванов Иван Иванович">
+            </div>
+
+            <div class="form-group">
+                <label for="email">Электронная почта:</label>
+                <input type="email" id="email" name="email" required placeholder="example@mail.ru">
+            </div>
+
+            <div class="form-group">
+                <label for="phone">Телефон:</label>
+                <input type="tel" id="phone" name="phone" required placeholder="+7(906)-561-43-22">
+            </div>
+
+            <div class="form-group">
+                <label for="password">Пароль:</label>
+                <input type="password" id="password" name="password" required minlength="6" title="Пароль должен содержать минимум 6 символов.">
+            </div>
+
+            <div class="form-group">
+                <label for="confirm-password">Повторите пароль:</label>
+                <input type="password" id="confirm-password" name="confirm-password" required minlength="6">
+            </div>
+
+            <div class="form-group">
+                <label for="date">Укажите дату рождения:</label>
+                <input type="date" id="date" name="date" required max="<?php echo date('Y-m-d', strtotime('-18 years')); ?>">
+            </div>
+
+            <button type="submit">Зарегистрироваться</button>
+        </form>
+        
+    </section>
+
+    <script>
+        document.getElementById('registrationForm').addEventListener('submit', function(event) {
+            event.preventDefault(); 
+
+            const name = document.getElementById('name').value.trim();
+            const email = document.getElementById('email').value.trim();
+            const phone = document.getElementById('phone').value.trim();
+            const password = document.getElementById('password').value;
+            const confirmPassword = document.getElementById('confirm-password').value;
+
+
+            if (!name) {
+                alert("Пожалуйста, введите ваше ФИО.");
+                return;
+            }
+
+      
+            const nameParts = name.split(' ');
+            if (nameParts.length !== 3) {
+                alert("Пожалуйста, введите ваше ФИО в формате 'Имя Фамилия Отчество'.");
+                return;
+            }
+
+            const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailPattern.test(email)) {
+                alert("Пожалуйста, введите корректный адрес электронной почты.");
+                return;
+            }
+
+            const phonePattern = /^\+7\(\d{3}\)-\d{3}-\d{2}-\d{2}$/; 
+            if (!phonePattern.test(phone)) {
+                alert("Пожалуйста, введите корректный номер телефона в формате +7(906)-561-43-22.");
+                return;
+            }
+
+            if (password !== confirmPassword) {
+                alert("Пароли не совпадают!");
+                return;
+            }
+
+            const user = { name, email, phone, password };
+
+            let users = JSON.parse(localStorage.getItem('users')) || [];
+
+            if (users.some(existingUser => existingUser.email === email)) {
+                alert("Пользователь с таким email уже существует!");
+                return;
+            }
+
+            users.push(user);
+            localStorage.setItem('users', JSON.stringify(users));
+
+            alert("Регистрация прошла успешно!");
+
+            window.location.href = 'login.html'; 
+        });
+
+      
+        document.getElementById('phone').addEventListener('input', function(e) {
+            let input = e.target.value.replace(/\D/g, ''); 
+            if (input.length > 11) input = input.substring(0, 11); 
+
+      
+            let formattedValue = '+7';
+            
+            if (input.length > 1) {
+                formattedValue += '(' + input.substring(1, 4); 
+                if (input.length >= 4) {
+                    formattedValue += ')-' + input.substring(4, 7); 
+                    if (input.length >= 7) {
+                        formattedValue += '-' + input.substring(7, 9); 
+                        if (input.length >= 9) {
+                            formattedValue += '-' + input.substring(9); 
+                        }
+                    }
+                }
+            }
+
+            e.target.value = formattedValue; 
+        });
+    </script>
+</body>
+</html>
